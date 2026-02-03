@@ -9,6 +9,8 @@ run npm install
 
 copy . .
 
+run npm run build
+
 expose 3000
 
 

@@ -5,13 +5,19 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build":"tsc -b",
-    "start":"nodemon dist/index.js"
+    "build": "tsc -b",
+    "start": "nodemon dist/index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@octokit/webhooks": "^14.2.0",
+    "dotenv": "^17.2.3",
     "fastify": "^5.7.4"
+  },
+  "devDependencies": {
+    "@types/node": "^25.2.0",
+    "typescript": "^5.9.3"
   }
 }
