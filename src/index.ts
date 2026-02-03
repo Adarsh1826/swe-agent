@@ -4,6 +4,7 @@ import fastify from "fastify";
 
 const app = fastify()
 
+const port = parseInt(process.env.PORT!);
 
 
 webhook.on('issues',async({payload})=>{
@@ -55,7 +56,6 @@ app.post("/webhook", async (req, reply) => {
   }
 });
 
-app.listen({port:3000},()=>{
-    console.log("Server is listening on http://localhost:3000");
-    
-})
+app.listen({ port: port, host: "0.0.0.0" }, async () => {
+  console.log(`Server is listening on http://localhost:${port}`);
+});
