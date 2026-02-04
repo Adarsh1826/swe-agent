@@ -39,7 +39,7 @@ app.post("/webhook", async (req, reply) => {
     const payload = Buffer.isBuffer(req.body)
       ? req.body.toString("utf8")
       : JSON.stringify(req.body);
-
+    
     
 
     await webhook.verifyAndReceive({
