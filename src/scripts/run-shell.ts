@@ -2,7 +2,7 @@ import { spawn } from "child_process";
 
 export default function runGitCloneShellScript(repoUrl:string) {
 
-    const child = spawn("sh", ["./gitclone.sh", repoUrl]);
+    const child = spawn("sh", ["/app/gitclone.sh", repoUrl]);
 
     child.stdout.on("data", (data) => {
         console.log(`stdout: ${data}`);
