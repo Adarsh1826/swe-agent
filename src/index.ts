@@ -50,7 +50,10 @@ webhook.on('issues', async ({ payload }) => {
     
     console.log("Files in /app:");
     console.log(fs.readdirSync("/app"));
-    
+    console.log(
+  fs.readdirSync("/tmp/repos", { withFileTypes:true })
+    .map(f => f.name)
+);
 
 
 
