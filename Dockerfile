@@ -8,7 +8,7 @@ run npm install
 
 
 copy . .
-run chmod +x /app/gitclone.sh
+run chmod +x /app/src/shell/gitclone.sh
 run npm run build
 
 expose 3000
