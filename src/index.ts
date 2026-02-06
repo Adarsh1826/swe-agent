@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import { webhook } from './webhook/webhook';
+import runGitCloneShellScript from './scripts/run-shell';
 import fastify from "fastify";
 
 const app = fastify()
@@ -7,30 +8,59 @@ const app = fastify()
 const port = parseInt(process.env.PORT!);
 
 
-webhook.on('issues',async({payload})=>{
-    console.log("Webhook sever hit")
+webhook.on('issues', async ({ payload }) => {
+  console.log("Webhook sever hit")
 
-    if(payload.action=="opened" || payload.action=="reopened"){
-        const owner = payload.repository.owner.login
-        const repo = payload.repository.name
-        const issues = payload.issue
+  if (payload.action == "opened" || payload.action == "reopened") {
+    // owner name
+    const owner = payload.repository.owner.login;
+    // repo name
+    const repo = payload.repository.name;
+    // label of the issue (here all label is covered)
+    const labels = payload.issue.labels?.map(l=>l?.name);
 
-        console.log(owner);
-        console.log(repo);
-        console.log(issues);
-        
-        
-        
-    }
+    // author
+
+    const author = payload.issue.user?.login;
+
+    const issueData = {
+      number: payload.issue.number,
+      title: payload.issue.title,
+      body: payload.issue.body || "",
+      labels: labels,
+      author: author,
+      url: payload.issue.html_url
+    };
+
+    console.log("Owner:", owner);
+    console.log("Repo:", repo);
+    console.log("Issue Data:", issueData);
+
+
+    // here i will call the shell script
+
+    const repoUrl = `https://github.com/${owner}/${repo}.git`;
+
+    console.log(repoUrl);
+
+    runGitCloneShellScript(repoUrl)
+    
+
+    
+
+
+
+
+  }
 })
 
 
 // for testing server is up or not
 
-app.get('/health',(req,res)=>{
-    res.send({
-        "status":"running"
-    })
+app.get('/health', (req, res) => {
+  res.send({
+    "status": "running"
+  })
 })
 
 // for webhook endpoint
@@ -39,8 +69,8 @@ app.post("/webhook", async (req, reply) => {
     const payload = Buffer.isBuffer(req.body)
       ? req.body.toString("utf8")
       : JSON.stringify(req.body);
-    
-    
+
+
 
     await webhook.verifyAndReceive({
       id: req.headers["x-github-delivery"] as string,
