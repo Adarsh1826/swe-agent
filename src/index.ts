@@ -2,6 +2,7 @@ import 'dotenv/config';
 import { webhook } from './webhook/webhook';
 import runGitCloneShellScript from './scripts/run-shell';
 import fastify from "fastify";
+import fs from "fs";
 
 const app = fastify()
 
@@ -44,8 +45,11 @@ webhook.on('issues', async ({ payload }) => {
     console.log(repoUrl);
 
     runGitCloneShellScript(repoUrl)
-    
 
+    // debuuging logs
+    
+    console.log("Files in /app:");
+    console.log(fs.readdirSync("/app"));
     
 
 
