@@ -91,6 +91,8 @@ FORMAT:
       data?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
 
     // Extract JSON safely
+    console.log(aiText);
+    
     const jsonMatch = aiText.match(/\[[\s\S]*\]/);
     const updatedFiles: GeminiUpdatedFile[] =
       jsonMatch ? JSON.parse(jsonMatch[0]) : [];
