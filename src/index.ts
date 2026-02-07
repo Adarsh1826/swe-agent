@@ -12,13 +12,18 @@ const port = parseInt(process.env.PORT!);
 webhook.on('issues', async ({ payload }) => {
   console.log("Webhook sever hit")
 
+  console.log(
+      fs.readdirSync("/tmp/repos", { withFileTypes: true })
+        .map(f => f.name)
+    );
+
   if (payload.action == "opened" || payload.action == "reopened") {
     // owner name
     const owner = payload.repository.owner.login;
     // repo name
     const repo = payload.repository.name;
     // label of the issue (here all label is covered)
-    const labels = payload.issue.labels?.map(l=>l?.name);
+    const labels = payload.issue.labels?.map(l => l?.name);
 
     // author
 
@@ -47,13 +52,9 @@ webhook.on('issues', async ({ payload }) => {
     runGitCloneShellScript(repoUrl)
 
     // debuuging logs
+
     
-    console.log("Files in /app:");
-    console.log(fs.readdirSync("/app"));
-    console.log(
-  fs.readdirSync("/tmp/repos", { withFileTypes:true })
-    .map(f => f.name)
-);
+    
 
 
 
