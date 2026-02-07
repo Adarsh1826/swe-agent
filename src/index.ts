@@ -12,10 +12,7 @@ const port = parseInt(process.env.PORT!);
 webhook.on('issues', async ({ payload }) => {
   console.log("Webhook sever hit")
 
-  console.log(
-      fs.readdirSync("/tmp/repos", { withFileTypes: true })
-        .map(f => f.name)
-    );
+  
 
   if (payload.action == "opened" || payload.action == "reopened") {
     // owner name
