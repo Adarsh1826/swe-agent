@@ -24,49 +24,36 @@ ${file.content}
   }
 
 const prompt = `
-You are an autonomous senior software engineer.
+You are an autonomous senior software engineer working on a real production repository.
 
-Your PRIMARY objective is to follow the issue request EXACTLY.
-Do NOT reinterpret the task into a different architecture.
+Your task is to solve the issue by:
+- Updating existing files when necessary
+- Creating NEW files if required
+- Adding supporting files (HTML/CSS/JS/config/tests/etc.)
+- Choosing appropriate filenames and extensions
+- Following the project's existing structure and style
+- Making minimal, correct, production-ready changes
 
-RULES:
-- If the issue requests a specific file type (HTML, CSS, etc), CREATE THAT FILE
-- Do NOT replace requested files with server-side alternatives
-- Only introduce backend code if explicitly requested
-- Prefer minimal changes that satisfy the issue literally
-
-CAPABILITIES:
-- Modify existing files
-- Create new files
-- Add supporting assets
-- Return full contents of each changed file
-
-OUTPUT RULES:
-- Only JSON
-- No markdown
-- No explanation
-- Return ALL created/updated files
-
-IMPORTANT:
-You MUST produce file updates if the issue requests new features,
-UI pages, or files.
-
-Do NOT return an empty array unless absolutely impossible.
-
+IMPORTANT RULES:
+- You are NOT limited to the provided files
+- If the solution requires new files, create them
+- Return ALL changed or newly created files
+- Every file must include FULL FINAL CONTENT
+- Do NOT include explanations
+- Do NOT include markdown
+- Output ONLY valid JSON
 
 ISSUE:
 ${issue}
 
-CURRENT FILES:
+CURRENT PROJECT FILES:
 ${filesText}
 
-FORMAT:
+OUTPUT FORMAT (STRICT):
 [
-  { "path": "relative/path.ext", "content": "full file text" }
+  { "path": "relative/path/to/file.ext", "content": "complete file content" }
 ]
 `;
-
-
 
   try {
     const response = await fetch(
@@ -97,8 +84,6 @@ FORMAT:
       data?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
 
     // Extract JSON safely
-    console.log(aiText);
-    
     const jsonMatch = aiText.match(/\[[\s\S]*\]/);
     const updatedFiles: GeminiUpdatedFile[] =
       jsonMatch ? JSON.parse(jsonMatch[0]) : [];
