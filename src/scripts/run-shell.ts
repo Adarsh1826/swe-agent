@@ -24,6 +24,7 @@
 
 import { spawn } from "child_process";
 import path from "path";
+import fs from "fs"
 
 // Helper to run a shell script and wait for it to finish
 export function runShellScript(scriptPath: string, args: string[] = [], cwd?: string): Promise<void> {
@@ -53,29 +54,41 @@ export function runShellScript(scriptPath: string, args: string[] = [], cwd?: st
 }
 
 // Your existing git clone function
-export function runGitCloneShellScript(repoUrl: string) {
-    return runShellScript("/app/src/shell/gitclone.sh", [repoUrl]);
+export function runGitCloneShellScript(
+  repoUrl: string,
+  targetDir: string
+) {
+  return runShellScript(
+    "/app/src/shell/gitclone.sh",
+    [repoUrl, targetDir]
+  );
 }
+
 
 // New async function to clone + install + start project
 export default async function installProjectDependency(repoUrl: string) {
-    try {
-        const TARGET_DIR = "/tmp";
+  try {
+    const TARGET_DIR = "/tmp/repos";
 
-        // Extract repo name from URL
-        const repoName = repoUrl.split("/").pop()?.replace(".git", "");
-        if (!repoName) throw new Error("Invalid repo URL");
+    const repoName = repoUrl.split("/").pop()?.replace(".git", "");
+    if (!repoName) throw new Error("Invalid repo URL");
 
-        const repoPath = path.join(TARGET_DIR, repoName);
+    const repoPath = path.join(TARGET_DIR, repoName);
 
-        console.log("Cloning repo...");
-        await runGitCloneShellScript(repoUrl);
+    await fs.promises.mkdir(TARGET_DIR, { recursive: true });
 
-        console.log("Installing dependencies and starting project...");
-        await runShellScript("/app/src/shell/setup.sh", [repoPath]);
+    console.log("Cloning repo...");
+    await runGitCloneShellScript(repoUrl, repoPath);
 
-        console.log("Project setup complete!");
-    } catch (err: any) {
-        console.error("Error installing project dependency:", err.message);
-    }
+    console.log("Installing dependencies...");
+    await runShellScript("/app/src/shell/setup.sh", [repoPath]);
+
+    console.log("Project setup complete!");
+
+    return repoPath;
+  } catch (err: any) {
+    console.error("Error installing project dependency:", err.message);
+    throw err;
+  }
 }
+

@@ -1,10 +1,10 @@
 #!/bin/bash
 
 REPO_URL=$1
-TARGET_DIR="/tmp"
+TARGET_DIR=$2
+
+echo "Cloning repo..."
 
 mkdir -p "$TARGET_DIR"
 
-cd "$TARGET_DIR" || exit
-
-git clone "$REPO_URL"
+git clone "$REPO_URL" "$TARGET_DIR"

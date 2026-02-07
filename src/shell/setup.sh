@@ -28,6 +28,7 @@ echo "Installing"
 npm install 
 
 echo "Starting project"
-npm run dev
+npm run dev || echo "No dev script — skipping"
+
 
 echo "Project started successfully in background."

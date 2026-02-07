@@ -45,11 +45,14 @@ webhook.on('issues', async ({ payload }) => {
     // here i will call the shell script
 
     const repoUrl = `https://github.com/${owner}/${repo}.git`;
-    const localRepoPath = `/tmp/repos/${repo}`;
+    //const localRepoPath = `/tmp/repos/${repo}`;
 
     console.log(repoUrl);
     // here i am starting the project
-    await installProjectDependency(repoUrl)
+   // await installProjectDependency(repoUrl);
+   const localRepoPath = await installProjectDependency(repoUrl);
+
+
 
     // now i will call to get all files
     const allFilesContent = collectRepoFiles(localRepoPath);
