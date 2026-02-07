@@ -46,7 +46,13 @@ OUTPUT RULES:
 - No markdown
 - No explanation
 - Return ALL created/updated files
-- Empty array if nothing needed
+
+IMPORTANT:
+You MUST produce file updates if the issue requests new features,
+UI pages, or files.
+
+Do NOT return an empty array unless absolutely impossible.
+
 
 ISSUE:
 ${issue}
