@@ -1,13 +1,13 @@
 import 'dotenv/config';
-import { webhook } from './webhook/webhook';
+import { webhook } from './webhook/webhook.js';
 import fastify from "fastify";
 import fs from "fs";
-import installProjectDependency from './scripts/run-shell';
-import { collectRepoFiles } from './utils/file-sys';
-import sendThisToGeminiForFileUpadtionAccoringtoIssue from './llm/gemini/gemini';
+import installProjectDependency from './scripts/run-shell.js';
+import { collectRepoFiles } from './utils/file-sys/index.js';
+import sendThisToGeminiForFileUpadtionAccoringtoIssue from './llm/gemini/gemini.js';
 import path from "path";
-import { createPRWithAppAuth } from './utils/pullrequest/pr';
-import simpleGit from "simple-git";
+import { createPRWithAppAuth } from './utils/pullrequest/pr.js';
+import { simpleGit } from 'simple-git';
 const app = fastify()
 
 const port = parseInt(process.env.PORT!);

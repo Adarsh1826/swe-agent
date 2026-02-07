@@ -1,4 +1,4 @@
-import { githubapp } from "../../auth/auth";
+import { githubapp } from "../../auth/auth.js";
 import path from "path";
 import fs from "fs";
 
