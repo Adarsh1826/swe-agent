@@ -53,8 +53,8 @@ export async function createPRWithAppAuth({
 
 export async function getInstallationToken(installationId: number) {
   const auth = createAppAuth({
-    appId: process.env.GITHUB_APP_ID!,
-    privateKey: process.env.GITHUB_PRIVATE_KEY!,
+    appId: process.env.APP_ID!,
+    privateKey: process.env.PRIVATE_KEY!,
   });
 
   const installationAuthentication = await auth({
