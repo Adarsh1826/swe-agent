@@ -1,5 +1,5 @@
 import { Webhooks } from "@octokit/webhooks";
-import { CustomError } from "../utils/constructor/error";
+import { CustomError } from "../utils/constructor/error.js";
 
 import 'dotenv/config';
 

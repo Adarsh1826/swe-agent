@@ -1,4 +1,4 @@
-import { CustomErrorInterface } from "../../types/constructor/constructor-types"
+import { CustomErrorInterface } from "../../types/constructor/constructor-types.js"
 export class CustomError extends Error{
     public statusCode : number | string
     constructor({message="Error",statusCode}:CustomErrorInterface){

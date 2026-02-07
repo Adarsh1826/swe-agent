@@ -1,5 +1,5 @@
 import { App } from "@octokit/app";
-import { CustomError } from "../utils/constructor/error";
+import { CustomError } from "../utils/constructor/error.js";
 
 const appId = process.env.APP_ID;
 const privateKey = process.env.PRIVATE_KEY;
