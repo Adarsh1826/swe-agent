@@ -8,6 +8,7 @@ import {sendThisToGeminiForFileUpadtionAccoringtoIssue} from './llm/gemini/gemin
 import path from "path";
 import { createPRWithAppAuth } from './utils/pullrequest/pr.js';
 import { simpleGit } from 'simple-git';
+import { githubapp } from './auth/auth.js';
 const app = fastify()
 
 const port = parseInt(process.env.PORT!);
@@ -69,29 +70,6 @@ webhook.on('issues', async ({ payload }) => {
 
     console.log(`Collected ${filesForGemini.length} files`);
 
-
-
-
-    // debuuging logs
-
-    // try {
-    //   const geminiResponse = await sendThisToGeminiForFileUpadtionAccoringtoIssue({
-    //     issue: issueData.body,
-    //     files: filesForGemini
-    //   });
-
-    //   console.log("Gemini updated files:", geminiResponse.updatedFiles.length);
-
-     
-    //   geminiResponse.updatedFiles.forEach(file => {
-    //     const fullPath = path.join(localRepoPath, file.path);
-    //     fs.writeFileSync(fullPath, file.content, "utf8");
-    //   });
-
-    //   console.log("Updated files written to repo!");
-    // } catch (err) {
-    //   console.error("Error updating files with Gemini:", err);
-    // }
 
     try {
   const geminiResponse = await sendThisToGeminiForFileUpadtionAccoringtoIssue({
