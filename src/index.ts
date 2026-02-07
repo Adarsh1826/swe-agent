@@ -1,9 +1,13 @@
 import 'dotenv/config';
 import { webhook } from './webhook/webhook';
-import runGitCloneShellScript from './scripts/run-shell';
 import fastify from "fastify";
 import fs from "fs";
-
+import installProjectDependency from './scripts/run-shell';
+import { collectRepoFiles } from './utils/file-sys';
+import sendThisToGeminiForFileUpadtionAccoringtoIssue from './llm/gemini/gemini';
+import path from "path";
+import { createPRWithAppAuth } from './utils/pullrequest/pr';
+import simpleGit from "simple-git";
 const app = fastify()
 
 const port = parseInt(process.env.PORT!);
@@ -11,8 +15,6 @@ const port = parseInt(process.env.PORT!);
 
 webhook.on('issues', async ({ payload }) => {
   console.log("Webhook sever hit")
-
-  
 
   if (payload.action == "opened" || payload.action == "reopened") {
     // owner name
@@ -43,15 +45,102 @@ webhook.on('issues', async ({ payload }) => {
     // here i will call the shell script
 
     const repoUrl = `https://github.com/${owner}/${repo}.git`;
+    const localRepoPath = `/tmp/repos/${repo}`;
 
     console.log(repoUrl);
+    // here i am starting the project
+    await installProjectDependency(repoUrl)
 
-    runGitCloneShellScript(repoUrl)
+    // now i will call to get all files
+    const allFilesContent = collectRepoFiles(localRepoPath);
+
+
+
+    const filesForGemini = allFilesContent
+      .split("\n\n// FILE: ")
+      .slice(1) // first split is empty
+      .map(chunk => {
+        const [filePath, ...contentArr] = chunk.split("\n");
+        return { path: filePath.trim(), content: contentArr.join("\n") };
+      });
+
+    console.log(`Collected ${filesForGemini.length} files`);
+
+
+
 
     // debuuging logs
 
-    
-    
+    // try {
+    //   const geminiResponse = await sendThisToGeminiForFileUpadtionAccoringtoIssue({
+    //     issue: issueData.body,
+    //     files: filesForGemini
+    //   });
+
+    //   console.log("Gemini updated files:", geminiResponse.updatedFiles.length);
+
+     
+    //   geminiResponse.updatedFiles.forEach(file => {
+    //     const fullPath = path.join(localRepoPath, file.path);
+    //     fs.writeFileSync(fullPath, file.content, "utf8");
+    //   });
+
+    //   console.log("Updated files written to repo!");
+    // } catch (err) {
+    //   console.error("Error updating files with Gemini:", err);
+    // }
+
+    try {
+  const geminiResponse = await sendThisToGeminiForFileUpadtionAccoringtoIssue({
+    issue: issueData.body,
+    files: filesForGemini
+  });
+
+  console.log("Gemini updated files:", geminiResponse.updatedFiles.length);
+
+  // Write updated files
+  geminiResponse.updatedFiles.forEach(file => {
+    const fullPath = path.join(localRepoPath, file.path);
+    fs.writeFileSync(fullPath, file.content, "utf8");
+  });
+
+  console.log("Updated files written to repo!");
+
+  // 1️⃣ Commit & push changes
+  const branchName = `issue-${issueData.number}-update`;
+  const git = simpleGit(localRepoPath);
+
+  // Checkout new branch
+  await git.checkoutLocalBranch(branchName);
+
+  // Stage all files
+  await git.add(".");
+
+  // Commit changes
+  await git.commit(`Auto-update files for issue #${issueData.number}`);
+
+  // Push branch
+  await git.push("origin", branchName);
+  console.log("Changes committed and pushed to branch:", branchName);
+
+  // 2️⃣ Create PR using your old style function
+  const prNumber = await createPRWithAppAuth({
+    owner,
+    repo,
+    branchName,
+    title: `Fix: ${issueData.title}`,
+    body: `Auto-updated files for issue #${issueData.number}\n\n${issueData.body}`,
+    installationId: payload.installation?.id!
+  });
+
+  console.log("PR successfully created. PR number:", prNumber);
+
+} catch (err) {
+  console.error("Error updating files or creating PR:", err);
+}
+
+
+
 
 
 

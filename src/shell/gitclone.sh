@@ -1,7 +1,7 @@
 #!/bin/bash
 
 REPO_URL=$1
-TARGET_DIR="/tmp/repos"
+TARGET_DIR="/tmp"
 
 mkdir -p "$TARGET_DIR"
 
