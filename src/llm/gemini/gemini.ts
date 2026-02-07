@@ -23,22 +23,38 @@ ${file.content}
 `;
   }
 
-  const prompt = `
-You are an expert software engineer.
+const prompt = `
+You are an autonomous senior software engineer working on a real production repository.
 
-Update the following project files according to this issue.
+Your task is to solve the issue by:
+- Updating existing files when necessary
+- Creating NEW files if required
+- Adding supporting files (HTML/CSS/JS/config/tests/etc.)
+- Choosing appropriate filenames and extensions
+- Following the project's existing structure and style
+- Making minimal, correct, production-ready changes
+
+IMPORTANT RULES:
+- You are NOT limited to the provided files
+- If the solution requires new files, create them
+- Return ALL changed or newly created files
+- Every file must include FULL FINAL CONTENT
+- Do NOT include explanations
+- Do NOT include markdown
+- Output ONLY valid JSON
 
 ISSUE:
 ${issue}
 
-FILES:
+CURRENT PROJECT FILES:
 ${filesText}
 
-Return ONLY valid JSON (no markdown, no explanation):
+OUTPUT FORMAT (STRICT):
 [
-  { "path": "file/path.js", "content": "updated content here" }
+  { "path": "relative/path/to/file.ext", "content": "complete file content" }
 ]
 `;
+
 
   try {
     const response = await fetch(
