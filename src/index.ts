@@ -4,7 +4,7 @@ import fastify from "fastify";
 import fs from "fs";
 import installProjectDependency from './scripts/run-shell.js';
 import { collectRepoFiles } from './utils/file-sys/index.js';
-import {sendThisToGeminiForFileUpadtionAccoringtoIssue} from './llm/gemini/gemini.js';
+import { sendThisToGeminiForFileUpadtionAccoringtoIssue } from './llm/gemini/gemini.js';
 import path from "path";
 import { createPRWithAppAuth } from './utils/pullrequest/pr.js';
 import { simpleGit } from 'simple-git';
@@ -51,8 +51,8 @@ webhook.on('issues', async ({ payload }) => {
 
     console.log(repoUrl);
     // here i am starting the project
-   // await installProjectDependency(repoUrl);
-   const localRepoPath = await installProjectDependency(repoUrl);
+    // await installProjectDependency(repoUrl);
+    const localRepoPath = await installProjectDependency(repoUrl);
 
 
 
@@ -70,59 +70,61 @@ webhook.on('issues', async ({ payload }) => {
       });
 
     console.log(`Collected ${filesForGemini.length} files`);
-      try {
-  const geminiResponse = await sendThisToGeminiForFileUpadtionAccoringtoIssue({
-    issue: issueData.body,
-    files: filesForGemini
-  });
+    try {
+      const geminiResponse = await sendThisToGeminiForFileUpadtionAccoringtoIssue({
+        issue: issueData.body,
+        files: filesForGemini
+      });
 
-  console.log("Gemini updated files:", geminiResponse.updatedFiles.length);
+      console.log("Gemini updated files:", geminiResponse.updatedFiles.length);
 
-  if (geminiResponse.updatedFiles.length === 0) {
-    console.log("No file updates from Gemini — skipping git & PR");
-    return;
-  }
+      if (geminiResponse.updatedFiles.length === 0) {
+        console.log("No file updates from Gemini — skipping git & PR");
+        return;
+      }
 
-  // Write updated files
-  geminiResponse.updatedFiles.forEach(file => {
-    const fullPath = path.join(localRepoPath, file.path);
-    fs.writeFileSync(fullPath, file.content, "utf8");
-  });
+      // Write updated files
+      geminiResponse.updatedFiles.forEach(file => {
+        const fullPath = path.join(localRepoPath, file.path);
+        fs.writeFileSync(fullPath, file.content, "utf8");
+      });
 
-  const branchName = `issue-${issueData.number}-update`;
-  const git = simpleGit(localRepoPath);
+      const branchName = `issue-${issueData.number}-update`;
+      const git = simpleGit(localRepoPath);
 
-  // 🔐 AUTH FIX (this is the missing piece)
-  const installationId = payload.installation?.id!;
-  const token = await getInstallationToken(installationId);
+      // 🔐 AUTH FIX (this is the missing piece)
+      const installationId = payload.installation?.id!;
+      const token = await getInstallationToken(installationId);
+      console.log("Installation ID:", installationId);
 
-  const authRepoUrl =
-    `https://x-access-token:${token}@github.com/${owner}/${repo}.git`;
 
-  await git.remote(["set-url", "origin", authRepoUrl]);
+      const authRepoUrl =
+        `https://x-access-token:${token}@github.com/${owner}/${repo}.git`;
 
-  // git flow
-  await git.checkoutLocalBranch(branchName);
-  await git.add(".");
-  await git.commit(`Auto-update files for issue #${issueData.number}`);
-  await git.push("origin", branchName);
+      await git.remote(["set-url", "origin", authRepoUrl]);
 
-  console.log("Changes committed and pushed to branch:", branchName);
+      // git flow
+      await git.checkoutLocalBranch(branchName);
+      await git.add(".");
+      await git.commit(`Auto-update files for issue #${issueData.number}`);
+      await git.push("origin", branchName);
 
-  const prNumber = await createPRWithAppAuth({
-    owner,
-    repo,
-    branchName,
-    title: `Fix: ${issueData.title}`,
-    body: `Auto-updated files for issue #${issueData.number}\n\n${issueData.body}`,
-    installationId
-  });
+      console.log("Changes committed and pushed to branch:", branchName);
 
-  console.log("PR successfully created. PR number:", prNumber);
+      const prNumber = await createPRWithAppAuth({
+        owner,
+        repo,
+        branchName,
+        title: `Fix: ${issueData.title}`,
+        body: `Auto-updated files for issue #${issueData.number}\n\n${issueData.body}`,
+        installationId
+      });
 
-} catch (err) {
-  console.error("Error updating files or creating PR:", err);
-}
+      console.log("PR successfully created. PR number:", prNumber);
+
+    } catch (err) {
+      console.error("Error updating files or creating PR:", err);
+    }
 
 
   }
