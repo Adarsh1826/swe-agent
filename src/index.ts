@@ -79,6 +79,9 @@ webhook.on('issues', async ({ payload }) => {
 
       console.log("Gemini updated files:", geminiResponse.updatedFiles.length);
 
+      console.log(geminiResponse.updatedFiles);
+      
+
       if (geminiResponse.updatedFiles.length === 0) {
         console.log("No file updates from Gemini — skipping git & PR");
 
