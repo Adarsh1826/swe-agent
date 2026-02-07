@@ -4,7 +4,7 @@ import fastify from "fastify";
 import fs from "fs";
 import installProjectDependency from './scripts/run-shell.js';
 import { collectRepoFiles } from './utils/file-sys/index.js';
-import sendThisToGeminiForFileUpadtionAccoringtoIssue from './llm/gemini/gemini.js';
+import {sendThisToGeminiForFileUpadtionAccoringtoIssue} from './llm/gemini/gemini.js';
 import path from "path";
 import { createPRWithAppAuth } from './utils/pullrequest/pr.js';
 import { simpleGit } from 'simple-git';
