@@ -3,7 +3,12 @@ import { CustomError } from "../utils/constructor/error.js";
 
 const appId = process.env.APP_ID;
 const privateKey = process.env.PRIVATE_KEY;
-if(!appId || privateKey ){
+
+// console.log(appId);
+// console.log(privateKey);
+
+
+if(!appId ||! privateKey ){
     throw new CustomError({
         message:"Github app missing credentials",
         statusCode:503
