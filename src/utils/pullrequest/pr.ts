@@ -25,10 +25,10 @@ export async function createPRWithAppAuth({
   installationId: number;
 }) {
   try {
-    // 1️⃣ Get Octokit instance for this repo installation
+    //  Get Octokit instance for this repo installation
     const octokit = await githubapp.getInstallationOctokit(installationId);
 
-    // 2️⃣ Create the PR using raw request (old style)
+    // Create the PR using raw request (old style)
     const response = await octokit.request(
       "POST /repos/{owner}/{repo}/pulls",
       {
@@ -41,10 +41,10 @@ export async function createPRWithAppAuth({
       }
     );
 
-    console.log("✅ PR created:", response.data.html_url);
+    console.log(" PR created:", response.data.html_url);
     return response.data.number; // PR number
   } catch (err) {
-    console.error("❌ Failed to create PR:", err);
+    console.error(" Failed to create PR:", err);
     throw err;
   }
 }

@@ -1,27 +1,3 @@
-// import { spawn } from "child_process";
-
-// export default function runGitCloneShellScript(repoUrl:string) {
-
-//     const child = spawn("/app/src/shell/gitclone.sh", [repoUrl]);
-
-//     child.stdout.on("data", (data) => {
-//         console.log(`stdout: ${data}`);
-//     });
-
-//     child.stderr.on("data", (data) => {
-//         console.error(`stderr: ${data}`);
-//     });
-
-//     child.on("error", (error) => {
-//         console.error(`error: ${error.message}`);
-//     });
-
-//     child.on("close", (code) => {
-//         console.log(`Exited with code ${code}`);
-//     });
-// }
-
-
 import { spawn } from "child_process";
 import path from "path";
 import fs from "fs"
@@ -53,7 +29,7 @@ export function runShellScript(scriptPath: string, args: string[] = [], cwd?: st
     });
 }
 
-// Your existing git clone function
+
 export function runGitCloneShellScript(
   repoUrl: string,
   targetDir: string
@@ -65,7 +41,7 @@ export function runGitCloneShellScript(
 }
 
 
-// New async function to clone + install + start project
+// function to clone install and start
 export default async function installProjectDependency(repoUrl: string) {
   try {
     const TARGET_DIR = "/tmp/repos";

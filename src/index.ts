@@ -2,13 +2,14 @@ import 'dotenv/config';
 import { webhook } from './webhook/webhook.js';
 import fastify from "fastify";
 import fs from "fs";
+
 import installProjectDependency from './scripts/run-shell.js';
 import { collectRepoFiles } from './utils/file-sys/index.js';
 import { sendThisToGeminiForFileUpadtionAccoringtoIssue } from './llm/gemini/gemini.js';
 import path from "path";
 import { createPRWithAppAuth } from './utils/pullrequest/pr.js';
 import { simpleGit } from 'simple-git';
-import { githubapp } from './auth/auth.js';
+
 import { getInstallationToken } from './utils/pullrequest/pr.js';
 const app = fastify()
 
@@ -80,6 +81,7 @@ webhook.on('issues', async ({ payload }) => {
 
       if (geminiResponse.updatedFiles.length === 0) {
         console.log("No file updates from Gemini — skipping git & PR");
+
         return;
       }
 
@@ -92,7 +94,7 @@ webhook.on('issues', async ({ payload }) => {
       const branchName = `issue-${issueData.number}-update`;
       const git = simpleGit(localRepoPath);
 
-      // 🔐 AUTH FIX (this is the missing piece)
+
       const installationId = payload.installation?.id!;
       const token = await getInstallationToken(installationId);
       console.log("Installation ID:", installationId);
@@ -125,8 +127,20 @@ webhook.on('issues', async ({ payload }) => {
     } catch (err) {
       console.error("Error updating files or creating PR:", err);
     }
+    finally {
+      try {
+        if (localRepoPath) {
+          await fs.promises.rm(localRepoPath, {
+            recursive: true,
+            force: true
+          });
+          console.log("Cleaned ", localRepoPath);
 
-
+        }
+      } catch (error) {
+        console.error("Cleanup failed:", error);
+      }
+    }
   }
 })
 

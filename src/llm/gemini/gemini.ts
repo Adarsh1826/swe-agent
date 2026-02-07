@@ -1,11 +1,5 @@
-interface GeminiUpdatedFile {
-  path: string;
-  content: string;
-}
-
-interface GeminiResponse {
-  updatedFiles: GeminiUpdatedFile[];
-}
+import { GeminiResponse } from "../../types/geminitypes/gemini-types.js";
+import { GeminiUpdatedFile } from "../../types/geminitypes/gemini-types.js";
 
 export async function sendThisToGeminiForFileUpadtionAccoringtoIssue({
   issue,
