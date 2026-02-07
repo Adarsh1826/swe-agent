@@ -1,6 +1,10 @@
 import { githubapp } from "../../auth/auth.js";
 import path from "path";
 import fs from "fs";
+import { simpleGit } from "simple-git";
+
+import { createAppAuth } from "@octokit/auth-app";
+
 
 // Function to create a PR using GitHub App style
 export async function createPRWithAppAuth({
@@ -43,4 +47,20 @@ export async function createPRWithAppAuth({
     console.error("❌ Failed to create PR:", err);
     throw err;
   }
+}
+
+
+
+export async function getInstallationToken(installationId: number) {
+  const auth = createAppAuth({
+    appId: process.env.GITHUB_APP_ID!,
+    privateKey: process.env.GITHUB_PRIVATE_KEY!,
+  });
+
+  const installationAuthentication = await auth({
+    type: "installation",
+    installationId,
+  });
+
+  return installationAuthentication.token;
 }

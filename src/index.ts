@@ -9,6 +9,7 @@ import path from "path";
 import { createPRWithAppAuth } from './utils/pullrequest/pr.js';
 import { simpleGit } from 'simple-git';
 import { githubapp } from './auth/auth.js';
+import { getInstallationToken } from './utils/pullrequest/pr.js';
 const app = fastify()
 
 const port = parseInt(process.env.PORT!);
@@ -69,9 +70,7 @@ webhook.on('issues', async ({ payload }) => {
       });
 
     console.log(`Collected ${filesForGemini.length} files`);
-
-
-    try {
+      try {
   const geminiResponse = await sendThisToGeminiForFileUpadtionAccoringtoIssue({
     issue: issueData.body,
     files: filesForGemini
@@ -79,39 +78,44 @@ webhook.on('issues', async ({ payload }) => {
 
   console.log("Gemini updated files:", geminiResponse.updatedFiles.length);
 
+  if (geminiResponse.updatedFiles.length === 0) {
+    console.log("No file updates from Gemini — skipping git & PR");
+    return;
+  }
+
   // Write updated files
   geminiResponse.updatedFiles.forEach(file => {
     const fullPath = path.join(localRepoPath, file.path);
     fs.writeFileSync(fullPath, file.content, "utf8");
   });
 
-  console.log("Updated files written to repo!");
-
-  // 1️⃣ Commit & push changes
   const branchName = `issue-${issueData.number}-update`;
   const git = simpleGit(localRepoPath);
 
-  // Checkout new branch
+  // 🔐 AUTH FIX (this is the missing piece)
+  const installationId = payload.installation?.id!;
+  const token = await getInstallationToken(installationId);
+
+  const authRepoUrl =
+    `https://x-access-token:${token}@github.com/${owner}/${repo}.git`;
+
+  await git.remote(["set-url", "origin", authRepoUrl]);
+
+  // git flow
   await git.checkoutLocalBranch(branchName);
-
-  // Stage all files
   await git.add(".");
-
-  // Commit changes
   await git.commit(`Auto-update files for issue #${issueData.number}`);
-
-  // Push branch
   await git.push("origin", branchName);
+
   console.log("Changes committed and pushed to branch:", branchName);
 
-  // 2️⃣ Create PR using your old style function
   const prNumber = await createPRWithAppAuth({
     owner,
     repo,
     branchName,
     title: `Fix: ${issueData.title}`,
     body: `Auto-updated files for issue #${issueData.number}\n\n${issueData.body}`,
-    installationId: payload.installation?.id!
+    installationId
   });
 
   console.log("PR successfully created. PR number:", prNumber);
@@ -119,6 +123,9 @@ webhook.on('issues', async ({ payload }) => {
 } catch (err) {
   console.error("Error updating files or creating PR:", err);
 }
+
+
+  
 
 
 
