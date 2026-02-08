@@ -9,9 +9,7 @@ export async function sendThisToGeminiForFileUpadtionAccoringtoIssue({
   files: { path: string; content: string }[];
 }): Promise<GeminiResponse> {
 
-  if (!files || files.length === 0) {
-    return { updatedFiles: [] };
-  }
+  
 
   // Build file text (same pattern as aiReview)
   let filesText = "";
