@@ -72,49 +72,7 @@ webhook.on('issues', async ({ payload }) => {
 
     console.log(`Collected ${filesForGemini.length} files`);
     try {
-      // const geminiResponse = await sendThisToGeminiForFileUpadtionAccoringtoIssue({
-      //   issue: issueData.body,
-      //   files: filesForGemini
-      // });
 
-      // console.log("Gemini updated files:", geminiResponse.updatedFiles.length);
-
-      // console.log(geminiResponse.updatedFiles);
-
-
-      // if (geminiResponse.updatedFiles.length === 0) {
-      //   console.log("No file updates from Gemini — skipping git & PR");
-
-      //   return;
-      // }
-
-      // // Write updated files
-      // geminiResponse.updatedFiles.forEach(file => {
-      //   const fullPath = path.join(localRepoPath, file.path);
-      //   fs.writeFileSync(fullPath, file.content, "utf8");
-      // });
-
-      // const branchName = `issue-${issueData.number}-update`;
-      // const git = simpleGit(localRepoPath);
-
-
-      // const installationId = payload.installation?.id!;
-      // const token = await getInstallationToken(installationId);
-      // console.log("Installation ID:", installationId);
-
-
-      // const authRepoUrl =
-      //   `https://x-access-token:${token}@github.com/${owner}/${repo}.git`;
-
-      // await git.remote(["set-url", "origin", authRepoUrl]);
-
-      // // git flow
-      // await git.checkoutLocalBranch(branchName);
-      // await git.add(".");
-      // await git.commit(`Auto-update files for issue #${issueData.number}`);
-      // await git.push("origin", branchName);
-
-      // console.log("Changes committed and pushed to branch:", branchName);
 
       const geminiResponse =
         await sendThisToGeminiForFileUpadtionAccoringtoIssue({
@@ -130,13 +88,13 @@ webhook.on('issues', async ({ payload }) => {
         return;
       }
 
-      // ✅ SAFE WRITE
+
       for (const file of geminiResponse.updatedFiles) {
         if (!file.path || !file.content) continue;
 
         const fullPath = path.join(localRepoPath, file.path);
 
-        // ⭐ CRITICAL FIX — create directories
+
         fs.mkdirSync(path.dirname(fullPath), { recursive: true });
 
         fs.writeFileSync(fullPath, file.content, "utf8");
@@ -155,7 +113,7 @@ webhook.on('issues', async ({ payload }) => {
 
       await git.remote(["set-url", "origin", authRepoUrl]);
 
-      // ✅ CLEAN GIT FLOW
+
       await git.checkoutLocalBranch(branchName);
 
       // Stage ONLY changed files
