@@ -8,9 +8,6 @@ export async function sendThisToGeminiForFileUpadtionAccoringtoIssue({
   issue: string;
   files: { path: string; content: string }[];
 }): Promise<GeminiResponse> {
-
-  
-
   // Build file text (same pattern as aiReview)
   let filesText = "";
   for (const file of files) {
@@ -21,7 +18,7 @@ ${file.content}
 `;
   }
 
-const prompt = `
+  const prompt = `
 You are an autonomous senior software engineer working on a real production repository.
 
 Your task is to solve the issue by:
@@ -69,7 +66,7 @@ OUTPUT FORMAT (STRICT):
             },
           ],
         }),
-      }
+      },
     );
 
     if (!response.ok) {
@@ -78,16 +75,15 @@ OUTPUT FORMAT (STRICT):
 
     const data = await response.json();
 
-    const aiText =
-      data?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+    const aiText = data?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
 
     // Extract JSON safely
     const jsonMatch = aiText.match(/\[[\s\S]*\]/);
-    const updatedFiles: GeminiUpdatedFile[] =
-      jsonMatch ? JSON.parse(jsonMatch[0]) : [];
+    const updatedFiles: GeminiUpdatedFile[] = jsonMatch
+      ? JSON.parse(jsonMatch[0])
+      : [];
 
     return { updatedFiles };
-
   } catch (error) {
     console.error("Gemini fetch error:", error);
     return { updatedFiles: [] };
