@@ -86,10 +86,10 @@ OUTPUT FORMAT (STRICT):
     const updatedFiles: GeminiUpdatedFile[] =
       jsonMatch ? JSON.parse(jsonMatch[0]) : [];
 
-    return { updatedFiles };
+    return { text: aiText, updatedFiles };
 
   } catch (error) {
     console.error("Gemini fetch error:", error);
-    return { updatedFiles: [] };
+    return { text: "", updatedFiles: [] };
   }
 }

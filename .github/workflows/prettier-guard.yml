@@ -1,0 +1,34 @@
+name: Prettier Guard
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  prettier:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - run: npm ci
+
+      - name: Run Prettier
+        run: npx prettier --write .
+
+      - name: Commit if needed
+        run: |
+          if [[ -n $(git status --porcelain) ]]; then
+            git config user.name "prettier-bot"
+            git config user.email "bot@prettier.ai"
+            git add .
+            git commit -m "chore(prettier): auto-format"
+            git push
+          fi

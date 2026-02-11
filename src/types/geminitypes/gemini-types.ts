@@ -4,5 +4,6 @@ export interface GeminiUpdatedFile {
 }
 
 export interface GeminiResponse {
+  text: string;
   updatedFiles: GeminiUpdatedFile[];
 }
