@@ -1,5 +1,5 @@
-import { GeminiResponse } from "../../types/geminitypes/gemini-types.js";
-import { GeminiUpdatedFile } from "../../types/geminitypes/gemini-types.js";
+import { GeminiResponse } from '../../types/geminitypes/gemini-types.js';
+import { GeminiUpdatedFile } from '../../types/geminitypes/gemini-types.js';
 
 export async function sendThisToGeminiForFileUpadtionAccoringtoIssue({
   issue,
@@ -8,11 +8,8 @@ export async function sendThisToGeminiForFileUpadtionAccoringtoIssue({
   issue: string;
   files: { path: string; content: string }[];
 }): Promise<GeminiResponse> {
+  let filesText = '';
 
-  
-
-  // Build file text (same pattern as aiReview)
-  let filesText = "";
   for (const file of files) {
     filesText += `
 File: ${file.path}
@@ -21,7 +18,7 @@ ${file.content}
 `;
   }
 
-const prompt = `
+  const prompt = `
 You are an autonomous senior software engineer working on a real production repository.
 
 Your task is to solve the issue by:
@@ -57,19 +54,19 @@ OUTPUT FORMAT (STRICT):
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
       {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           contents: [
             {
-              role: "user",
+              role: 'user',
               parts: [{ text: prompt }],
             },
           ],
         }),
-      }
+      },
     );
 
     if (!response.ok) {
@@ -78,18 +75,39 @@ OUTPUT FORMAT (STRICT):
 
     const data = await response.json();
 
-    const aiText =
-      data?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+    const aiText: string =
+      data?.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
 
-    // Extract JSON safely
+    if (!aiText) {
+      console.warn('Gemini returned empty response');
+      return { text: '', updatedFiles: [] };
+    }
+
+    /* ---------------- Safe JSON Extraction ---------------- */
     const jsonMatch = aiText.match(/\[[\s\S]*\]/);
-    const updatedFiles: GeminiUpdatedFile[] =
-      jsonMatch ? JSON.parse(jsonMatch[0]) : [];
+
+    if (!jsonMatch) {
+      console.warn('No JSON array found in Gemini response');
+      return { text: aiText, updatedFiles: [] };
+    }
+
+    let updatedFiles: GeminiUpdatedFile[] = [];
+
+    try {
+      updatedFiles = JSON.parse(jsonMatch[0]);
+    } catch (parseError) {
+      console.error('JSON parse failed:', parseError);
+      return { text: aiText, updatedFiles: [] };
+    }
 
     return { text: aiText, updatedFiles };
 
   } catch (error) {
-    console.error("Gemini fetch error:", error);
-    return { text: "", updatedFiles: [] };
+    console.error('Gemini fetch error:', error);
+
+    return {
+      text: '',
+      updatedFiles: [],
+    };
   }
 }

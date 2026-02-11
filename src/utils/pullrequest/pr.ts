@@ -5,7 +5,6 @@ import { simpleGit } from "simple-git";
 
 import { createAppAuth } from "@octokit/auth-app";
 
-
 // Function to create a PR using GitHub App style
 export async function createPRWithAppAuth({
   owner,
@@ -29,17 +28,14 @@ export async function createPRWithAppAuth({
     const octokit = await githubapp.getInstallationOctokit(installationId);
 
     // Create the PR using raw request (old style)
-    const response = await octokit.request(
-      "POST /repos/{owner}/{repo}/pulls",
-      {
-        owner,
-        repo,
-        head: branchName,
-        base: baseBranch,
-        title,
-        body,
-      }
-    );
+    const response = await octokit.request("POST /repos/{owner}/{repo}/pulls", {
+      owner,
+      repo,
+      head: branchName,
+      base: baseBranch,
+      title,
+      body,
+    });
 
     console.log(" PR created:", response.data.html_url);
     return response.data.number; // PR number
@@ -48,8 +44,6 @@ export async function createPRWithAppAuth({
     throw err;
   }
 }
-
-
 
 export async function getInstallationToken(installationId: number) {
   const auth = createAppAuth({
