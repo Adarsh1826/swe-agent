@@ -11,6 +11,11 @@ import { createPRWithAppAuth } from "./utils/pullrequest/pr.js";
 import { simpleGit } from "simple-git";
 
 import { getInstallationToken } from "./utils/pullrequest/pr.js";
+
+import { parseFileToAST } from "./tools/codecleaningtool/ast.js";
+import { saveChunks } from "./tools/chunksaving/index.js";
+import { ChunkTypes } from "./types/rag-types/index.js";
+
 const app = fastify();
 
 const port = parseInt(process.env.PORT!);
@@ -174,3 +179,15 @@ app.post("/webhook", async (req, reply) => {
 app.listen({ port: port, host: "0.0.0.0" }, async () => {
   console.log(`Server is listening on http://localhost:${port}`);
 });
+
+// async function buildChunks() {
+//   const chunks: ChunkTypes[] = [];
+
+//   await parseFileToAST("./src", chunks);
+
+//   console.log("Chunks created:", chunks.length);
+
+//   await saveChunks(chunks);
+// }
+
+// buildChunks();
