@@ -10,3 +10,11 @@ export interface FileLookupInterface {
     url?: string;
   };
 }
+
+
+export type ChunkTypes = {
+  file: string;
+  name: string;
+  type: "function" | "class";
+  code: string;
+};
