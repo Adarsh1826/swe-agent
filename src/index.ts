@@ -35,8 +35,8 @@ webhook.on("issues", async ({ payload }) => {
 
     // now i will call project installation so i can clone the repo
 
-    const repoUrl  = `${GITHUB_REPO_URL}+${owner}+${repo}`
-    
+    const repoUrl  = `${GITHUB_REPO_URL}/${owner}/${repo}`
+
     console.log(repoUrl);
     
 
