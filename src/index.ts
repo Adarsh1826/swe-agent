@@ -1,21 +1,8 @@
 import "dotenv/config";
 import { webhook } from "./webhook/webhook.js";
 import fastify from "fastify";
-import fs from "fs";
-
-import installProjectDependency from "./scripts/run-shell.js";
-import { collectRepoFiles } from "./utils/file-sys/index.js";
-import { sendThisToGeminiForFileUpadtionAccoringtoIssue } from "./llm/gemini/gemini.js";
-import path from "path";
-import { createPRWithAppAuth } from "./utils/pullrequest/pr.js";
-import { simpleGit } from "simple-git";
-
-import { getInstallationToken } from "./utils/pullrequest/pr.js";
-
-import { parseFileToAST } from "./tools/codecleaningtool/ast.js";
-import { saveChunks } from "./tools/chunksaving/index.js";
-import { ChunkTypes } from "./types/rag-types/index.js";
-
+import installProjectDependencyAndStart from "./scripts/run-shell.js";
+import { GITHUB_REPO_URL } from "./links.js";
 const app = fastify();
 
 const port = parseInt(process.env.PORT!);
@@ -44,107 +31,24 @@ webhook.on("issues", async ({ payload }) => {
       url: payload.issue.html_url,
     };
 
-    console.log("Owner:", owner);
-    console.log("Repo:", repo);
-    console.log("Issue Data:", issueData);
+    // now i have issue and all detail now i will clone the repo 
 
-    // here i will call the shell script
+    // now i will call project installation so i can clone the repo
 
-    const repoUrl = `https://github.com/${owner}/${repo}.git`;
-    //const localRepoPath = `/tmp/repos/${repo}`;
-
+    const repoUrl  = `${GITHUB_REPO_URL}+${owner}+${repo}`
+    
     console.log(repoUrl);
-    // here i am starting the project
-    // await installProjectDependency(repoUrl);
-    const localRepoPath = await installProjectDependency(repoUrl);
+    
 
-    // now i will call to get all files
-    const allFilesContent = collectRepoFiles(localRepoPath);
 
-    const filesForGemini = allFilesContent
-      .split("\n\n// FILE: ")
-      .slice(1) // first split is empty
-      .map((chunk) => {
-        const [filePath, ...contentArr] = chunk.split("\n");
-        return { path: filePath.trim(), content: contentArr.join("\n") };
-      });
 
-    console.log(`Collected ${filesForGemini.length} files`);
-    try {
-      const geminiResponse =
-        await sendThisToGeminiForFileUpadtionAccoringtoIssue({
-          issue: `${issueData.title}\n\n${issueData.body}`, // FIX
-          files: filesForGemini,
-        });
 
-      console.log("Gemini updated files:", geminiResponse.updatedFiles.length);
-      console.log(geminiResponse.updatedFiles);
 
-      if (!geminiResponse.updatedFiles.length) {
-        console.log("No file updates from Gemini — skipping git & PR");
-        return;
-      }
+    
 
-      for (const file of geminiResponse.updatedFiles) {
-        if (!file.path || !file.content) continue;
-
-        const fullPath = path.join(localRepoPath, file.path);
-
-        fs.mkdirSync(path.dirname(fullPath), { recursive: true });
-
-        fs.writeFileSync(fullPath, file.content, "utf8");
-
-        console.log("Wrote:", file.path);
-      }
-
-      const branchName = `issue-${issueData.number}-update`;
-      const git = simpleGit(localRepoPath);
-
-      const installationId = payload.installation?.id!;
-      const token = await getInstallationToken(installationId);
-
-      const authRepoUrl = `https://x-access-token:${token}@github.com/${owner}/${repo}.git`;
-
-      await git.remote(["set-url", "origin", authRepoUrl]);
-
-      await git.checkoutLocalBranch(branchName);
-
-      // Stage ONLY changed files
-      const paths = geminiResponse.updatedFiles.map((f) => f.path);
-      await git.add(paths);
-
-      await git.commit(`Auto-update files for issue #${issueData.number}`);
-
-      await git.push("origin", branchName);
-
-      console.log("Changes committed and pushed to branch:", branchName);
-
-      const prNumber = await createPRWithAppAuth({
-        owner,
-        repo,
-        branchName,
-        title: `Fix: ${issueData.title}`,
-        body: `Auto-updated files for issue #${issueData.number}\n\n${issueData.body}`,
-        installationId,
-      });
-
-      console.log("PR successfully created. PR number:", prNumber);
-    } catch (err) {
-      console.error("Error updating files or creating PR:", err);
-    } finally {
-      try {
-        if (localRepoPath) {
-          await fs.promises.rm(localRepoPath, {
-            recursive: true,
-            force: true,
-          });
-          console.log("Cleaned ", localRepoPath);
-        }
-      } catch (error) {
-        console.error("Cleanup failed:", error);
-      }
-    }
   }
+
+
 });
 
 // for testing server is up or not
@@ -180,14 +84,3 @@ app.listen({ port: port, host: "0.0.0.0" }, async () => {
   console.log(`Server is listening on http://localhost:${port}`);
 });
 
-// async function buildChunks() {
-//   const chunks: ChunkTypes[] = [];
-
-//   await parseFileToAST("./src", chunks);
-
-//   console.log("Chunks created:", chunks.length);
-
-//   await saveChunks(chunks);
-// }
-
-// buildChunks();
