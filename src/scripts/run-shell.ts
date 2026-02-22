@@ -38,7 +38,7 @@ export function runGitCloneShellScript(repoUrl: string, targetDir: string) {
 }
 
 // function to clone install and start
-export default async function installProjectDependency(repoUrl: string) {
+export default async function installProjectDependencyAndStart(repoUrl: string) {
   try {
     const TARGET_DIR = "/tmp/repos";
 
