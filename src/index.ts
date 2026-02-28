@@ -3,7 +3,13 @@ import { webhook } from "./webhook/webhook.js";
 import fastify from "fastify";
 import installProjectDependencyAndStart from "./scripts/run-shell.js";
 import { GITHUB_REPO_URL } from "./links.js";
+import formbody from "@fastify/formbody";
+import apiRoutes from "./http/user/routes/route.js";
 const app = fastify();
+// route regiter
+app.register(apiRoutes);
+
+app.register(formbody)
 
 const port = parseInt(process.env.PORT!);
 
