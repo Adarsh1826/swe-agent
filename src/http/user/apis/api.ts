@@ -4,9 +4,9 @@
 
 import { FastifyRequest, FastifyReply } from "fastify";
 import { AddApiKeyBody } from "../../../types/http";
-import { CustomError } from "../../../utils/constructor/error";
-import { encrypt } from "../../../algorithm/encryption-decryption";
-import { prisma } from "../../../utils/db/db";
+import { CustomError } from "../../../utils/constructor/error.js";
+import { encrypt } from "../../../algorithm/encryption-decryption/index.js";
+import { prisma } from "../../../utils/db/db.js";
 
 export const addApiKey = async (req:FastifyRequest<{ Body: AddApiKeyBody }>,res:FastifyReply)=>{
     // extracting the content from the req 
