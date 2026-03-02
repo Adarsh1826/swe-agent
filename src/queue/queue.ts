@@ -1,4 +1,4 @@
-import { prisma } from "../utils/db/db";
+import { prisma } from "../utils/db/db.js";
 
 import installProjectDependencyAndStartProject from "../scripts/run-shell";
 // ab me ek ek pending job lunga aur shell script kaame krega
