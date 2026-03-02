@@ -19,7 +19,7 @@ export default async function processQueue() {
 
         const repoUrl = initialJob.repoUrl;
 
-        const res = installProjectDependencyAndStartProject(repoUrl)
+        //const res = installProjectDependencyAndStartProject(repoUrl)
 
         // abb isme sara thing krenege then funally staus update ke denfe
 
