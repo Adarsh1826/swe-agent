@@ -1,6 +1,6 @@
 import { prisma } from "../utils/db/db.js";
 
-import installProjectDependencyAndStartProject from "../scripts/run-shell";
+import installProjectDependencyAndStartProject from "../scripts/run-shell.js";
 // ab me ek ek pending job lunga aur shell script kaame krega
 
 export default async function processQueue() {
