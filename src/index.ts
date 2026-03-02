@@ -5,6 +5,7 @@ import installProjectDependencyAndStartProject from "./scripts/run-shell.js";
 import { GITHUB_REPO_URL } from "./links.js";
 import fastifyFormbody from "@fastify/formbody";
 import apiRoutes from "./http/user/routes/route.js";
+import { prisma } from "./utils/db/db.js";
 const app = fastify();
 // route regiter
 app.register(apiRoutes);
@@ -37,29 +38,54 @@ webhook.on("issues", async ({ payload }) => {
       url: payload.issue.html_url,
     };
 
-    // now i have issue and all detail now i will clone the repo 
+    // now i will save the user data in db if not exist
 
-    // now i will call project installation so i can clone the repo
-
-    const repoUrl  = `${GITHUB_REPO_URL}/${owner}/${repo}`
-
-    console.log(repoUrl);
-
-    console.log("Starting cloning and setup");
-
-    const activeStatus = installProjectDependencyAndStartProject(repoUrl)
-
-    console.log(activeStatus);
+    let user= await prisma.user.findFirst({
+      where:{
+        githubId:payload.sender.id
+      }
+    })
     
+    if(user){
+      // means not exist
+      user = await prisma.user.create({
+        data:{
+          githubId:payload.sender.id,
+          username : payload.sender.login,
+          avatarUrl:payload.sender.avatar_url,
+          profileUrl:payload.sender.html_url,
+        }
+      })
+      console.log(user);
+      
+    }
+    // now i will for for this id is repo exist in job queue or not 
+
+    // now check correspoing job exist in the db or not
+
+    let job = await  prisma.job.findFirst({
+      where:{
+        repoUrl: `${GITHUB_REPO_URL}/${owner}/${repo}`,
+        issueNumber:issueData.number
+      }
+    })
     
+    // agar same issue number se hai tb nhi lena hai
+
+    if(!job){
+      job= await prisma.job.create({
+        data:{
+          repoUrl: `${GITHUB_REPO_URL}/${owner}/${repo}`,
+          status:"PENDING",
+          issueNumber:issueData.number,
+          userId:user?.id,
+          guestId:"NULL",
+        }
+      })
+    }
+
+    console.log("Job saved sucessfully into the table");
     
-
-
-
-
-
-    
-
   }
 
 

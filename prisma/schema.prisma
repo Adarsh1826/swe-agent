@@ -11,13 +11,52 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+// user table
+model User {
+  id       Int    @id @default(autoincrement())
+  githubId      Int  @unique
+  username      String 
+  avatarUrl     String?  
+  profileUrl    String?
 
+  apis     Apis[]   
+  job  Job[]
+ 
+}
 
-// schema for storing the api keys provided by the user
-
-model Apis{
-  id Int @id @default(autoincrement())
+// api table
+model Apis {
+  id           Int    @id @default(autoincrement())
   providerName String
-  apiKey String
-  iv String
+  apiKey       String
+  iv           String
+
+  userId       Int?
+  user         User?  @relation(fields: [userId], references: [id])
+
+  guestId      String?
+
+  @@index([guestId])
+}
+// repo table 
+model Job{
+  id Int @id @default(autoincrement())
+  repoUrl  String
+  userId Int? 
+  status StatusEnum @default(PENDING)
+  issueNumber Int
+  
+
+  user User? @relation(fields: [userId],references: [id])
+  guestId String?
+  @@index([guestId])
+  @@unique([repoUrl, issueNumber])
+
+}
+
+
+
+enum StatusEnum{
+  PENDING
+  COMPLETED
 }
