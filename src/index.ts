@@ -5,7 +5,6 @@ import { GITHUB_REPO_URL } from "./links.js";
 import fastifyFormbody from "@fastify/formbody";
 import apiRoutes from "./http/user/routes/route.js";
 import { prisma } from "./utils/db/db.js";
-import processQueue from "./queue/queue.js";
 import './cron/cron.js'
 const app = fastify();
 // route regiter
@@ -121,16 +120,11 @@ app.post("/webhook", async (req, reply) => {
   }
 });
 // endpoint to test worker is doing thieru work or not
-app.get("/test-worker", async (req, res) => {
-  await processQueue();
-  res.send({ status: "worker ran" });
-});
 
 
 app.listen({ port: port, host: "0.0.0.0" }, async () => {
   console.log(`Server is listening on http://localhost:${port}`);
-  await processQueue();
-  console.log("Worker ran successfully");
+  
 
 });
 
