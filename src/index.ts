@@ -46,7 +46,7 @@ webhook.on("issues", async ({ payload }) => {
       }
     })
     
-    if(user){
+    if(!user){
       // means not exist
       user = await prisma.user.create({
         data:{
