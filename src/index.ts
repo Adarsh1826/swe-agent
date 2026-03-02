@@ -6,6 +6,7 @@ import fastifyFormbody from "@fastify/formbody";
 import apiRoutes from "./http/user/routes/route.js";
 import { prisma } from "./utils/db/db.js";
 import processQueue from "./queue/queue.js";
+import './cron/cron.js'
 const app = fastify();
 // route regiter
 app.register(apiRoutes);
