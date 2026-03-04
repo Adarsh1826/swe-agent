@@ -46,6 +46,9 @@ model Job{
   status StatusEnum @default(PENDING)
   issueNumber Int
   
+  issueTitle     String     
+  issueBody      String     
+  installationId Int        
 
   user User? @relation(fields: [userId],references: [id])
   guestId String?

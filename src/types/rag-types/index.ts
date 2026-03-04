@@ -17,4 +17,12 @@ export type ChunkTypes = {
   name: string;
   type: "function" | "class";
   code: string;
+  fileImports?: string;   
+  startLine?: number;     
+  endLine?: number;
 };
+
+export interface EmbeddedChunk {
+  chunk: ChunkTypes;
+  embedding: number[];
+}
