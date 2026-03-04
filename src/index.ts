@@ -80,6 +80,9 @@ webhook.on("issues", async ({ payload }) => {
           issueNumber:issueData.number,
           userId:user?.id,
           guestId:"NULL",
+          issueTitle:issueData.title,
+          issueBody:issueData.body,
+          installationId:payload.installation!.id
         }
       })
     }

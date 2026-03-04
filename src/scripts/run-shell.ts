@@ -38,26 +38,19 @@ export function runGitCloneShellScript(repoUrl: string, targetDir: string) {
 }
 
 // function to clone install and start
-export default async function installProjectDependencyAndStartProject(repoUrl: string) {
+export default async function installProjectDependencyAndStartProject(repoUrl: string,targetDir:string) {
   try {
-    const TARGET_DIR = "/tmp/repos";
-
-    const repoName = repoUrl.split("/").pop()?.replace(".git", "");
-    if (!repoName) throw new Error("Invalid repo URL");
-
-    const repoPath = path.join(TARGET_DIR, repoName);
-
-    await fs.promises.mkdir(TARGET_DIR, { recursive: true });
+    
 
     console.log("Cloning repo...");
-    await runGitCloneShellScript(repoUrl, repoPath);
+    await runGitCloneShellScript(repoUrl, targetDir);
 
     console.log("Installing dependencies...");
-    await runShellScript("/app/src/shell/setup.sh", [repoPath]);
+    await runShellScript("/app/src/shell/setup.sh", [targetDir]);
 
     console.log("Project setup complete!");
 
-    return repoPath;
+    return targetDir;
   } catch (err: any) {
     console.error("Error installing project dependency:", err.message);
     throw err;

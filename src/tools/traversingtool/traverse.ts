@@ -1,20 +1,42 @@
-import ts from 'typescript'
+import ts from 'typescript';
 import { ChunkTypes } from '../../types/rag-types/index.js';
 
-export default function traversalInAst(node: ts.Node, filePath: string,chunk:ChunkTypes[],source: ts.SourceFile,) {
-  node.forEachChild((child) => {
+function getFileImports(source: ts.SourceFile): string {
+  const imports: string[] = [];
+  source.forEachChild((node) => {
+    if (ts.isImportDeclaration(node)) {
+      imports.push(node.getText(source));
+    }
+  });
+  return imports.join("\n");
+}
 
+export default function traversalInAst(
+  node: ts.Node,
+  filePath: string,
+  chunk: ChunkTypes[],
+  source: ts.SourceFile,
+  fileImports?: string  
+) {
+  // Only calculate once (first call), then pass it down
+  const imports = fileImports ?? getFileImports(source);
+
+  node.forEachChild((child) => {
     if (ts.isFunctionDeclaration(child) || ts.isClassDeclaration(child)) {
-      //console.log("Found in", filePath, "->", child.name?.getText());
+      const { line: startLine } = source.getLineAndCharacterOfPosition(child.getStart());
+      const { line: endLine } = source.getLineAndCharacterOfPosition(child.getEnd());
+
       chunk.push({
-        file:filePath,
+        file: filePath,
         name: child.name?.getText() ?? "anonymous",
         type: ts.isFunctionDeclaration(child) ? "function" : "class",
-        code: child.getText(source)
-      })
+        code: child.getText(source),
+        fileImports: imports,
+        startLine,
+        endLine,
+      });
     }
-    // recursive call again
-    
-    traversalInAst(child, filePath,chunk,source);
+
+    traversalInAst(child, filePath, chunk, source, imports); 
   });
 }
