@@ -1,31 +1,45 @@
-const { VoyageAIClient } = await import("voyageai");
-import { CustomError } from "../utils/constructor/error.js";
 import { ChunkTypes } from "../types/rag-types/index.js";
-import { EmbeddedChunk } from "../types/rag-types/index.js";
-const key = process.env.VOYAGE_API_KEY
-if (!key) {
-    throw new CustomError({
-        statusCode: 404,
-        message: "Key is missing for embeeding"
-    })
+
+const VOYAGE_API_KEY = process.env.VOYAGE_API_KEY!;
+
+export interface EmbeddedChunk {
+  chunk: ChunkTypes;
+  embedding: number[];
 }
-const voyage = new VoyageAIClient({ apiKey: key })
 
-// first i will embed the issue
+// Call Voyage API directly (no broken SDK)
+async function callVoyageAPI(texts: string[]): Promise<number[][]> {
+  const res = await fetch("https://api.voyageai.com/v1/embeddings", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${VOYAGE_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      input: texts,
+      model: "voyage-code-3",
+    }),
+  });
 
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Voyage API error: ${err}`);
+  }
+
+  const json = await res.json();
+  // Returns sorted by index
+  return json.data.map((item: any) => item.embedding);
+}
+
+// Embed the issue
 export async function embedIssue(text: string): Promise<number[]> {
-    const result = await voyage.embed({
-        input: [text],
-        model: 'voyage-code-3'
-    })
-    console.log(Object.keys(result.data![0]));
-    return result.data![0].embedding as number[]
-
+  const embeddings = await callVoyageAPI([text]);
+  return embeddings[0];
 }
-// i will embed the chukns
-export async function embedChunk(chunks: ChunkTypes[]): Promise<EmbeddedChunk[]> {
 
-    const texts = chunks.map((c) => `
+// Embed all chunks
+export async function embedChunk(chunks: ChunkTypes[]): Promise<EmbeddedChunk[]> {
+  const texts = chunks.map((c) => `
 File: ${c.file}
 Imports: ${c.fileImports ?? ""}
 Type: ${c.type}
@@ -35,12 +49,10 @@ Code:
 ${c.code}
 `.trim());
 
-    const result = await voyage.embed({
-        input: texts,
-        model: 'voyage-code-3'
-    })
-    return chunks.map((chunk, i) => ({
-        chunk,
-        embedding: result.data![i].embedding!,
-    }));
+  const embeddings = await callVoyageAPI(texts);
+
+  return chunks.map((chunk, i) => ({
+    chunk,
+    embedding: embeddings[i],
+  }));
 }
