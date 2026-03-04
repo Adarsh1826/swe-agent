@@ -1,4 +1,4 @@
-import { VoyageAIClient } from "voyageai";
+const { VoyageAIClient } = await import("voyageai");
 import { CustomError } from "../utils/constructor/error.js";
 import { ChunkTypes } from "../types/rag-types/index.js";
 import { EmbeddedChunk } from "../types/rag-types/index.js";
