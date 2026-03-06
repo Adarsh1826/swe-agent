@@ -38,9 +38,13 @@ export function runGitCloneShellScript(repoUrl: string, targetDir: string) {
 }
 
 // function to clone install and start
-export default async function installProjectDependencyAndStartProject(repoUrl: string,targetDir:string) {
+export default async function installProjectDependencyAndStartProject(repoUrl: string, targetDir: string) {
   try {
-    
+    // clean up if directory already exists
+    if (fs.existsSync(targetDir)) {
+      fs.rmSync(targetDir, { recursive: true, force: true });
+      console.log(`🧹 Cleaned up existing dir: ${targetDir}`);
+    }
 
     console.log("Cloning repo...");
     await runGitCloneShellScript(repoUrl, targetDir);
