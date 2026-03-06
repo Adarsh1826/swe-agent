@@ -15,7 +15,7 @@ export interface FileLookupInterface {
 export type ChunkTypes = {
   file: string;
   name: string;
-  type: "function" | "class";
+  type: "function" | "class" | "html" | "css";
   code: string;
   fileImports?: string;   
   startLine?: number;     
