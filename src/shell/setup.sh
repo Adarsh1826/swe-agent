@@ -21,7 +21,7 @@ cd "$TARGET_DIR" || exit
 
 if [ ! -f "package.json" ]; then
     echo "No package.json found. Not a Node.js project."
-    exit 1
+    exit 0
 fi
 
 echo "Installing"
