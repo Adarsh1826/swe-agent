@@ -1,4 +1,5 @@
 import { ChunkTypes } from "../types/rag-types/index.js";
+import { VOYAGE_URL } from "../links.js";
 
 const VOYAGE_API_KEY = process.env.VOYAGE_API_KEY!;
 
@@ -7,9 +8,9 @@ export interface EmbeddedChunk {
   embedding: number[];
 }
 
-// Call Voyage API directly (no broken SDK)
+
 async function callVoyageAPI(texts: string[]): Promise<number[][]> {
-  const res = await fetch("https://api.voyageai.com/v1/embeddings", {
+  const res = await fetch(VOYAGE_URL, {
     method: "POST",
     headers: {
       "Authorization": `Bearer ${VOYAGE_API_KEY}`,

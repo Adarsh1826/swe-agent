@@ -58,8 +58,8 @@ model Job{
 }
 
 
-
-enum StatusEnum{
+enum StatusEnum {
   PENDING
   COMPLETED
+  FAILED
 }
