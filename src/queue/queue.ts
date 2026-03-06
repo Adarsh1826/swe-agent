@@ -26,7 +26,8 @@ export default async function processQueue() {
       await parseFileToAST(targetDir, chunks);
 
       // Step 3: run RAG pipeline → get fix
-      const fix = await runRagPipeline(job.issueBody, chunks);
+      const issueText = job.issueBody?.trim() || job.issueTitle;
+      const fix = await runRagPipeline(issueText, chunks);
 
       // Step 4: create PR with fix
       const prUrl = await createPR(
