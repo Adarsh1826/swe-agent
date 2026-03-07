@@ -43,14 +43,14 @@ export default async function processQueue() {
         data: { status: "COMPLETED" },
       });
 
-      console.log(`✅ Job ${job.id} completed — PR: ${prUrl}`);
+      console.log(`Job ${job.id} completed — PR: ${prUrl}`);
     } catch (err) {
       // mark job as failed so it doesn't retry forever
       await prisma.job.update({
         where: { id: job.id },
         data: { status: "PENDING" },
       });
-      console.error(`❌ Job ${job.id} failed:`, err);
+      console.error(`Job ${job.id} failed:`, err);
     }
   }
 }

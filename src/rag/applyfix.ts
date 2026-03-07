@@ -10,7 +10,7 @@ export async function applyFix(
 
   await fs.writeFile(fullPath, fix.fixedCode, "utf-8");
 
-  console.log(`✅ Fix applied to ${fullPath}`);
+  console.log(`Fix applied to ${fullPath}`);
 
   return fullPath;
 }
