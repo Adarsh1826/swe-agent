@@ -30,7 +30,6 @@ model Apis {
   providerName String
   apiKey       String
   iv           String
-
   userId       Int?
   user         User?  @relation(fields: [userId], references: [id])
 
@@ -56,8 +55,7 @@ model Job{
   @@unique([repoUrl, issueNumber])
 
 }
-
-
+// ek active api key hoga 
 enum StatusEnum {
   PENDING
   COMPLETED
