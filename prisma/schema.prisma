@@ -32,7 +32,7 @@ model Apis {
   iv           String
   userId       Int?
   user         User?  @relation(fields: [userId], references: [id])
-
+  activeKey Boolean @default(false)
   guestId      String?
 
   @@index([guestId])
