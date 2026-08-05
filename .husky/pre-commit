@@ -1,1 +1,0 @@
-echo "npx lint-staged" > pre-commit

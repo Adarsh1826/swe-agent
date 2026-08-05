@@ -3,44 +3,19 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc -b",
-    "start": "nodemon dist/index.js",
-    "prepare": "husky"
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Adarsh1826/swe-agent.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "@fastify/formbody": "^8.0.2",
-    "@google/generative-ai": "^0.24.1",
-    "@octokit/app": "^16.1.2",
-    "@octokit/auth-app": "^8.2.0",
-    "@octokit/plugin-rest-endpoint-methods": "^17.0.0",
-    "@octokit/webhooks": "^14.2.0",
-    "@prisma/adapter-pg": "^7.4.2",
-    "@prisma/client": "^7.4.2",
-    "@qdrant/js-client-rest": "^1.17.0",
-    "dotenv": "^17.2.3",
-    "fastify": "^5.7.4",
-    "groq-sdk": "^0.37.0",
-    "node-cron": "^4.2.1",
-    "openai": "^6.29.0",
-    "pg": "^8.19.0",
-    "simple-git": "^3.30.0"
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Adarsh1826/swe-agent/issues"
   },
-  "devDependencies": {
-    "@types/node": "^25.2.0",
-    "@types/pg": "^8.16.0",
-    "husky": "^9.1.7",
-    "lint-staged": "^16.2.7",
-    "prettier": "^3.8.1",
-    "prisma": "^7.4.2",
-    "typescript": "^5.9.3"
-  },
-  "lint-staged": {
-    "*.{js,ts,jsx,tsx,json,css,md}": "prettier --write"
-  }
+  "homepage": "https://github.com/Adarsh1826/swe-agent#readme"
 }
