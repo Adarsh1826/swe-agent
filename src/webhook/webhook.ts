@@ -10,7 +10,6 @@ export const webhook = new Webhooks({
 
 // webhook handler for issue creation
 webhook.on('issues.opened',async({payload})=>{
-    console.log(payload.issue.title);
-    
+    console.log(payload.installation?.id);
 })
 
