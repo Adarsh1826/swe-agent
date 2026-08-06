@@ -1,1 +1,1 @@
-{"root":["./src/index.ts","./src/db/index.ts"],"version":"5.8.2"}
+{"root":["./src/index.ts","./src/auth/auth.ts","./src/db/index.ts","./src/schema/schema.ts","./src/webhook/webhook.ts"],"version":"5.8.2"}
